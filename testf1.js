@@ -30,8 +30,11 @@ class players extends collisable{
     push();
     stroke(color(10,10,10,70));
     strokeWeight(20);
+    //line(this.x-this.img.width*0.3,this.y-this.img.height*0.05,this.lx-100,this.ly-this.img.height*0.05);
+    //line(this.x-this.img.width*0.3,this.y+this.img.height*0.05,this.lx-100,this.ly+this.img.height*0.05);
+    
     line(this.x-this.img.width*0.3,this.y-this.img.height*0.05,this.lx-100,this.ly-this.img.height*0.05);
-    line(this.x-this.img.width*0.3,this.y+this.img.height*0.05,this.lx-100,this.ly+this.img.height*0.05);
+    line(this.x-this.img.width*0.3,this.y+this.img.height*0.05,this.lx+100,this.ly+this.img.height*0.05);
     translate(this.x,this.y);
     scale(0.3);
     image(this.img,0,0);
@@ -105,10 +108,9 @@ let img,fond,groundim;
 let score=0;
 let obstacle=[];
 let high =0;
-let sky,ground;
+let sky;
 let player=[];
 function preload(){
-  groundim=loadImage('img/game/ground.png');
   
   fond=loadImage('img/game/fond.png');
   img=loadImage('img/game/f1.png');
@@ -122,7 +124,6 @@ function setup(){
   textSize(50);
   noStroke();
   fond.resize(width,height);
-  groundim.resize(width,height/6);
   sky=new BG(fond,height/2);
   player[0]= new players(width/2,height/2,true,img);
   //player[1]= new players(width/4,height/4,false,img);
@@ -130,16 +131,11 @@ function setup(){
 
 let button;
 function draw(){
- 
-  background(0);
-  backg();
-  if(!dead){ 
+  if(!dead){
+    //draw background
+    background(0);
+    backg();
     play();
-  }else{
-    text("score :"+score,width/2,height/10);
-    text("highscore :"+high,width/2,2*height/10);
-    button.mousePressed(newgame);
-    
   }
  
 }
@@ -147,12 +143,6 @@ function draw(){
 function backg(){
   sky.move();
   sky.Draw();
-}
-//restart screen
-function restart(){
-    text("score :"+score,width/2,height/10);
-    text("highscore :"+high,width/2,2*height/10);
-    button.mousePressed(newgame);
 }
 
 //push other blocks
@@ -165,11 +155,11 @@ function pushother(){
     }
   }
 }
-
+//end game procedure
 function endgame(){
   dead=true;
   addbutton();
-  frame=0;
+  frame=-1;
   offset=0;
   if(score>high){
     high=score;
@@ -190,6 +180,7 @@ function detect(){
     }
   }
 }
+//detect collisions between cars
 function detectCar(){
   for(let carsel=0;carsel<player.length;carsel++){
     for(let carcol=carsel+1;carcol<player.length;carcol++){
@@ -217,12 +208,22 @@ let offset=0;
 
 function play(){
   
-  frame+=1;
  //add blocks
-  if(frame%30==0){
-    offset+=70*cos(frame*0.01);
-    obstacle[obstacle.length]= new blocks(5,70,height/2+offset-(roadsize/2+35));
-    obstacle[obstacle.length]= new blocks(5,70,height/2+offset+(roadsize/2+35));
+  if(frame%15==0){
+    offset+=70*cos(frame*0.05);
+    obstacle[obstacle.length]= new blocks(20,70,height/2+offset-(roadsize/2+35));
+    obstacle[obstacle.length]= new blocks(20,70,height/2+offset+(roadsize/2+35));
+    //begining blocks
+    if(frame==0){
+      //above
+      for(let i=0;i<int(height/2+offset-(roadsize/2+35));i+=obstacle[0].size){
+        obstacle[obstacle.length]=new blocks(20,70,height/2+offset-(roadsize/2+35+i));
+      }
+      //bellow
+      for(let i=0;i<int(height/2+offset+(roadsize/2+35));i+=obstacle[0].size){
+        obstacle[obstacle.length]=new blocks(20,70,height/2+offset+(roadsize/2+35+i));
+      }
+    }
     //add an assassin block
     /*
     if(random(0,100)<=(score*60)/100){
@@ -246,6 +247,8 @@ function play(){
   //tests
   detect();
   out();
+  //increase frame number
+  frame+=1;
 }
 function drawplayers(){
   for(let i=0;i<player.length;i++){
@@ -259,6 +262,9 @@ function addbutton(){
    button.style('background-color',color(88,224,68));
    button.style('font-size','50px');
    button.position(width/2-button.width/2,height/2-button.height/2);
+   button.mousePressed(newgame);
+   text("score :"+score,width/2,height/10);
+   text("highscore :"+high,width/2,2*height/10);
 }
 function newgame(){
   dead=false;
