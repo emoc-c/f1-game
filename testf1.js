@@ -1,3 +1,4 @@
+
 class collisable{
   constructor(posx,posy){
     this.x=posx;
@@ -9,32 +10,36 @@ class collisable{
   }
 }
 class players extends collisable{
-  constructor(posx,posy,posreal,posimg){
+  constructor(posx,posy,posreal,posimg,posid){
     super(posx,posy);
     this.real=posreal;
     this.img=posimg;
-    this.lx=0;
-    this.ly=0;
+    this.positions=[];
+    this.id=posid;
   }
   move(){
-    this.lx=this.x;
-    this.ly=this.y;
+    //save positions
+    if(frame%2==0){
+      //add current position
+      this.positions[this.positions.length]= new collisable(this.x,this.y);
+    }
+    //eject last position
+    if(this.positions.length>20){this.positions.splice(0,1);}
     if(this.real){
       this.x=mouseX;
       this.y=mouseY;
-    }else{
-        this.y=this.y;
     }
  }
   Draw(){
     push();
-    stroke(color(10,10,10,70));
-    strokeWeight(20);
-    //line(this.x-this.img.width*0.3,this.y-this.img.height*0.05,this.lx-100,this.ly-this.img.height*0.05);
-    //line(this.x-this.img.width*0.3,this.y+this.img.height*0.05,this.lx-100,this.ly+this.img.height*0.05);
-    
-    line(this.x-this.img.width*0.3,this.y-this.img.height*0.05,this.lx-100,this.ly-this.img.height*0.05);
-    line(this.x-this.img.width*0.3,this.y+this.img.height*0.05,this.lx+100,this.ly+this.img.height*0.05);
+    stroke(color(100,100,100,150));
+    strokeWeight(10);
+    if(this.positions.length==20)
+      for(let i=1;i<this.positions.length;i++){
+        //draw gaz
+        line(this.positions[i-1].x-(0.75*(this.img.width/2)*0.3),this.positions[i-1].y-(0.75*(this.img.height/2)*0.3),this.positions[i].x-(0.75*(this.img.width/2)*0.3)+10,this.positions[i].y-(0.75*(this.img.height/2)*0.3));
+        line(this.positions[i-1].x-(0.75*(this.img.width/2)*0.3),this.positions[i-1].y+(0.75*(this.img.height/2)*0.3),this.positions[i].x-(0.75*(this.img.width/2)*0.3)+10,this.positions[i].y+(0.75*(this.img.height/2)*0.3));
+      }
     translate(this.x,this.y);
     scale(0.3);
     image(this.img,0,0);
@@ -115,9 +120,10 @@ function preload(){
   fond=loadImage('img/game/fond.png');
   img=loadImage('img/game/f1.png');
   high= getItem('highscore');
+  login();
 }
 function setup(){
-  cnv= createCanvas(windowWidth,windowHeight);
+  cnv= createCanvas(1500,1000);
   //cnv.parent('game');
   imageMode(CENTER);
   textAlign(CENTER,CENTER);
@@ -125,7 +131,8 @@ function setup(){
   noStroke();
   fond.resize(width,height);
   sky=new BG(fond,height/2);
-  player[0]= new players(width/2,height/2,true,img);
+  //askServ();
+  //player[0]= new players(width/2,height/2,true,img);
   //player[1]= new players(width/4,height/4,false,img);
 }
 
@@ -207,7 +214,7 @@ let roadsize=300;
 let offset=0;
 
 function play(){
-  
+  askServ();
  //add blocks
   if(frame%15==0){
     offset+=70*cos(frame*0.05);
