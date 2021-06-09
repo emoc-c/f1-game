@@ -1,7 +1,7 @@
 let log;
 let ip='192.168.4.64:5000';
 function login(){
-  httpGet('http://'+ip+'/','json',function(response){console.log(response);
+  httpGet('https://'+ip+'/','json',function(response){console.log(response);
                                                              log=response;  
                                                           });
 }
