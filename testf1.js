@@ -123,8 +123,8 @@ function preload(){
   login();
 }
 function setup(){
-  cnv= createCanvas(1500,1000);
-  //cnv.parent('game');
+  cnv= createCanvas(1300,900);
+  cnv.parent('main');
   imageMode(CENTER);
   textAlign(CENTER,CENTER);
   textSize(50);
@@ -134,6 +134,9 @@ function setup(){
   //askServ();
   //player[0]= new players(width/2,height/2,true,img);
   //player[1]= new players(width/4,height/4,false,img);
+  if(log==null){
+    player[0]= new players(width/2,height/2,true,img);
+  }
 }
 
 let button;
